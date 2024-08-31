@@ -1,41 +1,58 @@
-# **AtliQ Sales Insights Power BI Dashboard**
+## Sales Insights Data Analysis Project
 
-This project is a comprehensive replication of AtliQ Hardware's sales analysis using Power BI, inspired by Codebasics' YouTube playlist. It demonstrates how data visualization can transform raw sales data into actionable insights. You can find the original Codebasics playlist [here](https://youtube.com/playlist?list=PLeo1K3hjS3uva8pk1FI3iK9kCOKQdz1I9).
+### Instructions to setup mysql on your local computer
 
-🔗 [View the Live Report](https://project.novypro.com/REY1Wf)
+1. Follow step in this video to install mysql on your local computer
+https://www.youtube.com/watch?v=WuBcTJnIuzo
 
-## **Problem Statement**
+1. SQL database dump is in db_dump.sql file above. Download `db_dump.sql` file to your local computer and import it as per instructions given in the tutorial video
 
-AtliQ Hardware, a prominent supplier of computer hardware and peripherals with multiple branches across India, is struggling with declining sales and ineffective performance tracking. The Sales Director faces challenges in understanding the current business state, as reports from regional managers are often sugar-coated and loaded with complex Excel sheets. This overwhelming influx of numbers makes it hard for management to consume data effectively, hindering decision-making.
+### Data Analysis Using SQL
 
-## **Solution**
+1. Show all customer records
 
-To tackle this issue, AtliQ's Sales Director decided to implement a Power BI dashboard, aiming to convert raw data into visually engaging insights. This would enable the team to make data-driven decisions quickly and effectively. A dedicated team of data professionals was hired to build and optimize this dashboard.
+    `SELECT * FROM customers;`
 
-## **AIMS Grid**
+1. Show total number of customers
 
-To ensure the project's focus and alignment with business goals, the AIMS Grid was employed:
+    `SELECT count(*) FROM customers;`
 
-- **Purpose:** Uncover hidden insights for the sales team and automate data processes to reduce manual efforts in data gathering.
-- **Stakeholders:** Sales Director, Marketing Team, Customer Service Team, Data & Analytics Team, IT.
-- **Success Criteria:** Develop dashboards that provide timely and actionable sales insights, contributing to a 10% cost saving of total spend through better decision-making.
-- **End Result:** An automated, dynamic dashboard delivering the latest sales insights to support data-driven decisions.
+1. Show transactions for Chennai market (market code for chennai is Mark001
 
-## **Steps Followed in the Project**
+    `SELECT * FROM transactions where market_code='Mark001';`
 
-1. **Initial Data Analysis:** Conducted high-level analysis using SQL to gain a thorough understanding of the dataset.
-2. **Data Integration:** Connected the SQL datasets directly to Power BI for seamless data integration.
-3. **ETL and Data Cleaning:** Performed ETL processes and cleaned the data to ensure accuracy and consistency.
-4. **Currency Conversion:** Standardized transaction currencies to maintain uniformity across financial data.
-5. **Measure Creation:** Developed various DAX measures to drive key insights within the Power BI visuals.
-6. **Stakeholder Feedback:** Incorporated feedback from stakeholders to refine and enhance the dashboard.
+1. Show distrinct product codes that were sold in chennai
 
-## **Outcome and Impact**
+    `SELECT distinct product_code FROM transactions where market_code='Mark001';`
 
-The AtliQ Sales Insights Dashboard has provided a clear view of the sales landscape, highlighting performance issues and areas of improvement. The dashboard's automated approach reduces manual data processing time, allowing the sales team to focus on strategy rather than data entry. With this tool, AtliQ is now poised to make faster, more informed decisions, ultimately driving business growth.
+1. Show transactions where currency is US dollars
 
-![Main_page_Sales_Insights](https://github.com/user-attachments/assets/a85adabc-f074-4568-8d65-dc0431741788)
+    `SELECT * from transactions where currency="USD"`
 
----
+1. Show transactions in 2020 join by date table
 
-Feel free to reach out if you have any questions or feedback about this project!
+    `SELECT transactions.*, date.* FROM transactions INNER JOIN date ON transactions.order_date=date.date where date.year=2020;`
+
+1. Show total revenue in year 2020,
+
+    `SELECT SUM(transactions.sales_amount) FROM transactions INNER JOIN date ON transactions.order_date=date.date where date.year=2020 and transactions.currency="INR\r" or transactions.currency="USD\r";`
+	
+1. Show total revenue in year 2020, January Month,
+
+    `SELECT SUM(transactions.sales_amount) FROM transactions INNER JOIN date ON transactions.order_date=date.date where date.year=2020 and and date.month_name="January" and (transactions.currency="INR\r" or transactions.currency="USD\r");`
+
+1. Show total revenue in year 2020 in Chennai
+
+    `SELECT SUM(transactions.sales_amount) FROM transactions INNER JOIN date ON transactions.order_date=date.date where date.year=2020
+and transactions.market_code="Mark001";`
+
+
+Data Analysis Using Power BI
+============================
+
+1. Formula to create norm_amount column
+
+`= Table.AddColumn(#"Filtered Rows", "norm_amount", each if [currency] = "USD" or [currency] ="USD#(cr)" then [sales_amount]*75 else [sales_amount], type any)`
+
+
+
